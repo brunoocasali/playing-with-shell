@@ -6,3 +6,9 @@ $ umount /dev/sdb1 # for example
 # Where is the 'memtest.img' is the image what you want to write 
 # and the 'sd' is the device destination
 $ sudo dd if=memtest.img of=/dev/sd? && sync
+
+# To return to the zero status use:
+$ sudo dd if=/dev/zero of=/dev/sd?
+
+# And format with ntfs type:
+$ sudo mkfs.ntfs -n data /dev/sd?
