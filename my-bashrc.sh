@@ -37,7 +37,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
+    xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -63,14 +63,6 @@ else
 fi
 unset color_prompt force_color_prompt
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -84,15 +76,16 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+finderx() {
+  cd $(find /home/bruno/ -name $1 2>/dev/null)
+}
+alias cec=finderx
 
 # Utilities
-alias rr='bundle exec rubocop -a'
-
-# Git Aliases
+alias rr='bundle exec rubocop -aD'
 
 alias gp='git push'
 alias gpl='git pull'
@@ -100,17 +93,23 @@ alias gc='git commit -m'
 alias ga='git add .'
 alias gst='git status'
 alias gb='git branch'
-alias gcc='git checkout'
+alias gcm='git checkout master'
 alias gm='git merge'
 alias grm='git rm --cached `git ls-files -i --exclude-from=.gitignore`'
+alias gh='git push heroku master'
+alias pgst='sudo service postgresql start'
+alias pgrt='sudo service postgresql restart'
 
 # Rails commands aliases
 alias mig='rake db:drop db:create db:migrate db:seed'
 alias et='RAILS_ENV=test'
 alias ep='RAILS_ENV=production'
 alias ed='RAILS_ENV=development'
-alias rss='rails server'
-alias rsc='rails console'
+alias rss='cd spec/dummy; rails server'
+alias rsc='./spec/dummy/bin/rails console'
+alias createmig='cd spec/dummy; rails g repense_core:install --force; cd ../..'
+
+alias g='gedit'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
