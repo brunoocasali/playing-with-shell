@@ -1,3 +1,15 @@
+export BLUE="\[\033[1;34m\]"
+export PURPLE="\[\033[1;35m\]"
+export NO_COLOR="\[\e[0m\]"
+export GRAY="\[\033[1;31m\]"
+export GREEN="\[\033[1;32m\]"
+export LIGHT_GRAY="\[\033[1;37m\]"
+export LIGHT_GREEN="\[\033[1;32m\]"
+export LIGHT_RED="\[\033[1;31m\]"
+export RED="\[\033[1;31m\]"
+export WHITE="\[\033[1;37m\]"
+export YELLOW="\[\033[1;33m\]"
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -80,7 +92,7 @@ fi
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 finderx() {
-  cd $(find /home/bruno/ -name $1 2>/dev/null)
+  cd $(find $HOME -name $1 2>/dev/null)
 }
 alias cec=finderx
 
@@ -136,10 +148,82 @@ if ! shopt -oq posix; then
 fi
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-export PS1='[$USER@$(hostname) $(basename $PWD)]$ ' # To remove the big path!
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
 
 # added by travis gem
 [ -f /home/bruno/.travis/travis.sh ] && source /home/bruno/.travis/travis.sh
+
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+
+
+custom_prompt () {
+  local BRANCH=`git branch 2> /dev/null | grep \* | sed 's/* //'`
+
+  if [[ "$BRANCH" = "" ]]; then
+    BRANCH=`git status 2> /dev/null | grep "On branch" | sed 's/# On branch //'`
+  fi
+
+  #local RUBY_VERSION=`ruby -e "puts RUBY_VERSION"`
+  local RAILS_PROMPT=""
+  local RUBY_PROMPT=""
+  local STATUS=`git status 2>/dev/null`
+  local PROMPT_COLOR=$GREEN
+  local STATE=" "
+  local NOTHING_TO_COMMIT="# Initial commit"
+  local BEHIND="# Your branch is behind"
+  local AHEAD="# Your branch is ahead"
+  local UNTRACKED="# Untracked files"
+  local DIVERGED="have diverged"
+  local CHANGED="# Changed but not updated"
+  local TO_BE_COMMITED="# Changes to be committed"
+  local LOG=`git log -1 2> /dev/null`
+
+  if [[ "$RAILS_VERSION" != "" ]]; then
+    RAILS_PROMPT="${RAILS_VERSION}@"
+  fi
+
+  if [[ "$GEMSET_NAME" != "" ]]; then
+    RUBY_PROMPT="${GREEN}[${RAILS_PROMPT}${NO_COLOR} "
+  else
+    RUBY_PROMPT="${GREEN}[${RAILS_PROMPT}${RUBY_VERSION}]${NO_COLOR} "
+  fi
+
+  if [ "$STATUS" != "" ]; then
+    if [[ "$STATUS" =~ "$NOTHING_TO_COMMIT" ]]; then
+      PROMPT_COLOR=$RED
+      STATE=""
+    elif [[ "$STATUS" =~ "$DIVERGED" ]]; then
+      PROMPT_COLOR=$RED
+      STATE="${STATE}${RED}↕${NO_COLOR}"
+    elif [[ "$STATUS" =~ "$BEHIND" ]]; then
+      PROMPT_COLOR=$RED
+      STATE="${STATE}${RED}↓${NO_COLOR}"
+    elif [[ "$STATUS" =~ "$AHEAD" ]]; then
+      PROMPT_COLOR=$RED
+      STATE="${STATE}${RED}↑${NO_COLOR}"
+    elif [[ "$STATUS" =~ "$CHANGED" ]]; then
+      PROMPT_COLOR=$RED
+      STATE=""
+    elif [[ "$STATUS" =~ "$TO_BE_COMMITED" ]]; then
+      PROMPT_COLOR=$RED
+      STATE=""
+    else
+      PROMPT_COLOR=$GREEN
+      STATE=""
+    fi
+
+    if [[ "$STATUS" =~ "$UNTRACKED" ]]; then
+      STATE="${STATE}${YELLOW}*${NO_COLOR}"
+    fi
+
+    PS1="[${GREEN}$USER@$(hostname)${GREEN} ${YELLOW}$(basename $PWD)${YELLOW} ${NO_COLOR}(${PROMPT_COLOR}${BRANCH}${NO_COLOR}${STATE}${NO_COLOR})]${BLUE}$ ${NO_COLOR}" # To remove the big path!
+  else
+    PS1="[${GREEN}$USER@$(hostname)${GREEN} ${YELLOW}$(basename $PWD)${NO_COLOR}]${BLUE}$ ${NO_COLOR}"
+  fi
+}
+
+PROMPT_COMMAND=custom_prompt
