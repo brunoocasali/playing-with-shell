@@ -18,14 +18,5 @@ $ sudo mkfs.ntfs -n data /dev/sd?
 
 ## FOR WINDOWS FILES IN MACBOOK
 
-# List the units you have (will be probably the disk2)
-$ diskutil list
-
-# Format the usb drive in a format that MS DOS understand
-$ diskutil eraseDisk MS-DOS "WIN10" GPT disk2
-
-# Mount the downloaded windows iso image
-$ hdiutil mount ~/Downloads/windows.iso
-
-# Copy all iso files to mounted disk
-$ rsync -ah --progress /Volumes/CCCOMA_X64FRE_PT-PT_DV9/* /Volumes/WIN10
+# Follow this: 
+# https://github.com/core-process/wininst-uefi-usb/blob/master/README.md
